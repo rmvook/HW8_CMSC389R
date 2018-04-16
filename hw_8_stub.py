@@ -2,6 +2,8 @@
 # if you do not have it from the git repo
 import md5py, socket, hashlib, string, sys, os, time
 
+f = open("output.txt", "w")
+
 host = "159.89.236.106"   # IP address or URL
 port = 5678 # port
 
@@ -26,6 +28,7 @@ print(data)
 temp = data[40:] 
 legit = temp.strip()
 print(legit)  
+f.write("Hash from which I based my crafted hash: " + legit + "\n")
 # a legit hash of secret + message goes here, obtained from signing a message
 
 # initialize hash object with state of a vulnerable hash
@@ -40,6 +43,7 @@ fake_hash.update(malicious)
 # test is the correct hash for md5(secret + message + padding + malicious)
 test = fake_hash.hexdigest()
 print("Testing fake" + test)
+f.write("Fake hash" + test + "\n")
 
 
 #############################
@@ -66,10 +70,11 @@ payload = message + padding + malicious
 print("PAYLOAD: " + payload)
 # send `test` and `payload` to server (manually or with sockets)
 # REMEMBER: every time you sign new data, you will regenerate a new secret!
+f.write("PAYLOAD: " + payload + "\n")
 
 
 two = "2\n"
-s.send(two)			     
+s.send(two)	#telling the server that I want to verify a hash.	     
 data = s.recv(1024)
 print(data)
 
@@ -80,11 +85,10 @@ print(data)
 
 s.send(payload + "\n")	
 
-data = s.recv(1024)
+data = s.recv(1024) # was not receiving everything, so did it twice.
 print(data)
 data = s.recv(1024)
 print(data)
 
-
-# close the connection
-s.close()
+s.close()# close the connection
+f.close()#close the file
